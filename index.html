@@ -3,18 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eagle</title>
+<title>Miguel — Factory for Paper Production</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --black: #0a0a0a;
-    --white: #f5f5f0;
-    --gray-dark: #1a1a1a;
-    --gray-mid: #2e2e2e;
-    --gray-light: #888;
-    --accent: #e8e8e0;
-    --border: rgba(255,255,255,0.1);
+    --black:      #0a0a08;
+    --white:      #f5f2ea;
+    --gold:       #c9a84c;
+    --gold-light: #e8d08a;
+    --gold-dark:  #8a6a1e;
+    --gray-dark:  #141410;
+    --gray-mid:   #232318;
+    --gray-light: #9a9070;
+    --border:     rgba(201,168,76,0.15);
+    --border-gold:rgba(201,168,76,0.35);
   }
 
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,7 +37,7 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 9990;
-    opacity: 0.4;
+    opacity: 0.3;
   }
 
   /* ── NAV ── */
@@ -45,26 +48,33 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 60px;
-    background: rgba(10,10,10,0.92);
+    padding: 14px 60px;
+    background: rgba(10,10,8,0.95);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-gold);
     transition: padding 0.3s;
     gap: 16px;
   }
-  nav.scrolled { padding: 14px 60px; }
+  nav.scrolled { padding: 10px 60px; }
 
-  .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    color: var(--white);
-    text-decoration: none;
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     cursor: pointer;
+    text-decoration: none;
     flex-shrink: 0;
   }
-  .logo span { color: var(--gray-light); }
+  .logo-img {
+    height: 54px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.3));
+    transition: filter 0.3s;
+  }
+  .logo-wrap:hover .logo-img { filter: drop-shadow(0 0 14px rgba(201,168,76,0.6)); }
+  .logo-upload-btn svg { flex-shrink: 0; }
+  #logoFileInput { display: none; }
 
   .nav-right {
     display: flex;
@@ -94,15 +104,14 @@
     position: absolute;
     bottom: -4px; left: 0; right: 0;
     height: 1px;
-    background: var(--white);
+    background: var(--gold);
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.4s cubic-bezier(0.77,0,0.18,1);
   }
-  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover { color: var(--gold-light); }
   .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
 
-  /* Hamburger */
   .hamburger {
     display: none;
     flex-direction: column;
@@ -115,7 +124,7 @@
     display: block;
     width: 24px;
     height: 2px;
-    background: var(--white);
+    background: var(--gold);
     transition: transform 0.3s, opacity 0.3s;
     transform-origin: center;
   }
@@ -123,14 +132,13 @@
   .hamburger.open span:nth-child(2) { opacity: 0; }
   .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-  /* Mobile nav drawer */
   .mobile-menu {
     display: none;
     position: fixed;
-    top: 60px; left: 0; right: 0;
-    background: rgba(10,10,10,0.98);
+    top: 78px; left: 0; right: 0;
+    background: rgba(10,10,8,0.98);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-gold);
     z-index: 999;
     flex-direction: column;
     padding: 24px 24px 32px;
@@ -156,14 +164,13 @@
     border-bottom: 1px solid var(--border);
     transition: color 0.3s;
   }
-  .mobile-menu a:hover { color: var(--white); }
+  .mobile-menu a:hover { color: var(--gold-light); }
   .mobile-menu .lang-toggle { align-self: flex-start; margin-top: 4px; }
 
-  /* ── LANGUAGE TOGGLE ── */
   .lang-toggle {
     display: flex;
     align-items: center;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid var(--border-gold);
     border-radius: 2px;
     overflow: hidden;
     cursor: pointer;
@@ -185,9 +192,9 @@
     z-index: 1;
     line-height: 1;
   }
-  .lang-toggle-btn.active { color: var(--black); background: var(--white); }
-  .lang-toggle-btn:hover:not(.active) { color: var(--white); }
-  .lang-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+  .lang-toggle-btn.active { color: var(--black); background: var(--gold); }
+  .lang-toggle-btn:hover:not(.active) { color: var(--gold-light); }
+  .lang-divider { width: 1px; height: 28px; background: var(--border-gold); flex-shrink: 0; }
 
   /* ── WHATSAPP FAB ── */
   .whatsapp-fab {
@@ -221,9 +228,6 @@
     box-shadow: 0 8px 32px rgba(37,211,102,0.45), 0 4px 12px rgba(0,0,0,0.5);
   }
   .whatsapp-fab svg { flex-shrink: 0; }
-  .whatsapp-fab .fab-label { }
-
-  /* Pulse ring */
   .whatsapp-fab::before {
     content: '';
     position: absolute;
@@ -238,22 +242,19 @@
     100% { opacity: 0; }
   }
 
-  /* ── SCROLL LINE ── */
   .scroll-line {
     position: fixed;
     top: 0; left: 0;
     height: 3px;
-    background: var(--white);
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
     z-index: 2000;
     transition: width 0.1s;
     width: 0%;
   }
 
-  /* ── PAGE ── */
   .page { display: none; }
   .page.active { display: block; }
 
-  /* ── HERO ── */
   #home {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -268,8 +269,8 @@
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
     background-size: 80px 80px;
     animation: gridMove 20s linear infinite;
   }
@@ -277,12 +278,13 @@
     0% { transform: translateY(0); }
     100% { transform: translateY(80px); }
   }
+
   .hero-text { position: relative; z-index: 2; }
   .hero-eyebrow {
     font-size: 11px;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: var(--gray-light);
+    color: var(--gold);
     margin-bottom: 20px;
     opacity: 0;
     animation: fadeUp 0.8s 0.3s forwards;
@@ -299,7 +301,7 @@
   .hero-title em {
     font-style: normal;
     color: transparent;
-    -webkit-text-stroke: 1px var(--white);
+    -webkit-text-stroke: 1px var(--gold);
   }
   .hero-desc {
     font-size: 15px;
@@ -319,7 +321,7 @@
   }
   .btn-primary {
     padding: 14px 28px;
-    background: var(--white);
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
     color: var(--black);
     border: none;
     font-family: 'Tajawal', sans-serif;
@@ -334,13 +336,13 @@
   }
   .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(255,255,255,0.15);
+    box-shadow: 0 12px 40px rgba(201,168,76,0.3);
   }
   .btn-outline {
     padding: 14px 28px;
     background: transparent;
-    color: var(--white);
-    border: 1px solid rgba(255,255,255,0.3);
+    color: var(--gold-light);
+    border: 1px solid var(--border-gold);
     font-family: 'Tajawal', sans-serif;
     font-size: 14px;
     font-weight: 500;
@@ -352,12 +354,11 @@
     white-space: nowrap;
   }
   .btn-outline:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: rgba(255,255,255,0.6);
+    background: rgba(201,168,76,0.08);
+    border-color: var(--gold);
     transform: translateY(-3px);
   }
 
-  /* ── PAPER ROLL VISUAL ── */
   .hero-visual {
     position: relative;
     z-index: 2;
@@ -426,15 +427,14 @@
     font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--gray-light);
+    color: var(--gold);
     white-space: nowrap;
   }
 
-  /* ── MARQUEE ── */
   .marquee-wrap {
     overflow: hidden;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border-gold);
+    border-bottom: 1px solid var(--border-gold);
     padding: 14px 0;
     background: var(--gray-dark);
   }
@@ -452,15 +452,14 @@
     font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--gray-light);
+    color: var(--gold);
     white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 20px;
   }
-  .marquee-item::after { content: '●'; font-size: 5px; color: rgba(255,255,255,0.3); }
+  .marquee-item::after { content: '◆'; font-size: 5px; color: rgba(201,168,76,0.4); }
 
-  /* ── ABOUT ── */
   #about {
     padding: 120px 60px;
     display: grid;
@@ -471,12 +470,12 @@
     overflow: hidden;
   }
   #about::before {
-    content: 'ABOUT';
+    content: 'MIGUEL';
     position: absolute;
     font-family: 'Playfair Display', serif;
-    font-size: 180px;
+    font-size: 140px;
     font-weight: 900;
-    color: rgba(255,255,255,0.02);
+    color: rgba(201,168,76,0.03);
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
@@ -490,7 +489,19 @@
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.6s, transform 0.6s;
+    position: relative;
+    overflow: hidden;
   }
+  .stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .stat-box:hover::before { opacity: 1; }
   .stat-box.visible { opacity: 1; transform: translateY(0); }
   .stat-box:nth-child(2) { transition-delay: 0.1s; }
   .stat-box:nth-child(3) { transition-delay: 0.2s; }
@@ -501,84 +512,119 @@
     font-weight: 900;
     line-height: 1;
     margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   .stat-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); }
   .about-content { position: relative; z-index: 2; }
-  .section-tag { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--gray-light); margin-bottom: 16px; }
+  .section-tag { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
   .section-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(28px, 4vw, 52px);
     font-weight: 900;
     line-height: 1.1;
     margin-bottom: 24px;
+    color: var(--white);
   }
   .section-text { font-size: 15px; line-height: 1.9; color: var(--gray-light); margin-bottom: 16px; }
-  .divider { width: 60px; height: 1px; background: var(--white); margin: 32px 0; }
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), transparent);
+    margin: 32px 0;
+  }
 
-  /* ── PRODUCTS ── */
   #products { padding: 120px 60px; position: relative; }
   .products-header { text-align: center; margin-bottom: 64px; }
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 2px;
+    max-width: 900px;
+    margin: 0 auto;
   }
   .product-card {
     background: var(--gray-dark);
     border: 1px solid var(--border);
-    padding: 40px 28px;
+    padding: 44px 32px;
     position: relative;
     overflow: hidden;
     cursor: pointer;
     opacity: 0;
     transform: translateY(40px);
-    transition: opacity 0.7s, transform 0.7s, background 0.3s;
+    transition: opacity 0.7s, transform 0.7s, background 0.3s, border-color 0.3s;
   }
   .product-card.visible { opacity: 1; transform: translateY(0); }
   .product-card:nth-child(2) { transition-delay: 0.1s; }
   .product-card:nth-child(3) { transition-delay: 0.2s; }
   .product-card:nth-child(4) { transition-delay: 0.3s; }
-  .product-card:nth-child(5) { transition-delay: 0.4s; }
-  .product-card:nth-child(6) { transition-delay: 0.5s; }
   .product-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 0.4s;
   }
-  .product-card:hover { background: #1e1e1e; }
+  .product-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .product-card:hover { background: #18180e; border-color: var(--border-gold); }
   .product-card:hover::before { opacity: 1; }
+  .product-card:hover::after { opacity: 1; }
   .product-icon {
-    width: 52px; height: 52px;
-    border: 1px solid rgba(255,255,255,0.2);
+    width: 56px; height: 56px;
+    border: 1px solid var(--border-gold);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 24px;
-    font-size: 20px;
-    transition: border-color 0.3s, transform 0.3s;
+    font-size: 22px;
+    transition: border-color 0.3s, transform 0.3s, background 0.3s;
+    background: rgba(201,168,76,0.05);
   }
-  .product-card:hover .product-icon { border-color: rgba(255,255,255,0.6); transform: scale(1.1) rotate(5deg); }
-  .product-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  .product-card:hover .product-icon {
+    border-color: var(--gold);
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(201,168,76,0.12);
+  }
+  .product-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--white);
+  }
   .product-desc { font-size: 13px; line-height: 1.8; color: var(--gray-light); margin-bottom: 20px; }
-  .product-specs { list-style: none; border-top: 1px solid var(--border); padding-top: 16px; display: flex; flex-direction: column; gap: 7px; }
+  .product-specs {
+    list-style: none;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
   .product-specs li { font-size: 12px; letter-spacing: 0.5px; color: var(--gray-light); display: flex; align-items: center; gap: 8px; }
-  .product-specs li::before { content: '—'; color: rgba(255,255,255,0.3); font-size: 10px; }
+  .product-specs li::before { content: '◆'; color: var(--gold); font-size: 7px; }
   .product-number {
     position: absolute;
     top: 20px; left: 20px;
     font-family: 'Playfair Display', serif;
     font-size: 52px;
     font-weight: 900;
-    color: rgba(255,255,255,0.04);
+    color: rgba(201,168,76,0.05);
     line-height: 1;
     pointer-events: none;
   }
 
-  /* ── CONTACT INFO SECTION ── */
   .contact-info-section {
     padding: 100px 60px;
     position: relative;
@@ -588,15 +634,14 @@
     content: '';
     position: absolute;
     width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%);
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
   }
-  .contact-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 2; }
+  .contact-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
   .contact-header { text-align: center; margin-bottom: 56px; }
 
-  /* WhatsApp card in contact */
   .contact-info {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -607,12 +652,12 @@
     border: 1px solid var(--border);
     text-align: center;
     background: var(--gray-dark);
-    transition: border-color 0.3s, transform 0.3s;
+    transition: border-color 0.3s, transform 0.3s, background 0.3s;
     text-decoration: none;
     color: var(--white);
     display: block;
   }
-  .info-item:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-4px); }
+  .info-item:hover { border-color: var(--border-gold); transform: translateY(-4px); background: #18180e; }
   .info-item.whatsapp-card:hover { border-color: rgba(37,211,102,0.5); }
   .info-icon { font-size: 26px; margin-bottom: 14px; }
   .info-icon.wa-icon {
@@ -624,8 +669,8 @@
     justify-content: center;
     margin: 0 auto 14px;
   }
-  .info-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray-light); margin-bottom: 8px; }
-  .info-value { font-size: 14px; font-weight: 500; }
+  .info-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .info-value { font-size: 14px; font-weight: 500; color: var(--white); }
   .wa-badge {
     display: inline-block;
     margin-top: 8px;
@@ -637,10 +682,9 @@
     border-radius: 20px;
   }
 
-  /* ── FOOTER ── */
   footer {
     padding: 40px 60px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-gold);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -648,13 +692,36 @@
     gap: 16px;
     flex-wrap: wrap;
   }
-  .footer-logo { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; letter-spacing: 2px; color: var(--white); }
+  .footer-logo-img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(201,168,76,0.25));
+  }
+  .footer-logo-placeholder {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
   .footer-copy { font-size: 12px; color: var(--gray-light); letter-spacing: 1px; }
   .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-  .footer-links a { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); text-decoration: none; transition: color 0.3s; cursor: pointer; }
-  .footer-links a:hover { color: var(--white); }
+  .footer-links a {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    text-decoration: none;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .footer-links a:hover { color: var(--gold-light); }
 
-  /* ── ANIMATIONS ── */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(30px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -664,41 +731,30 @@
     to   { opacity: 1; }
   }
 
-  /* ── LTR ── */
   html[dir="ltr"] .product-number { left: auto; right: 20px; }
   html[dir="ltr"] .whatsapp-fab { left: 28px; right: auto; }
+  html[dir="ltr"] .logo-upload-btn { right: auto; left: 28px; }
+  html[dir="ltr"] .divider { background: linear-gradient(90deg, var(--gold-dark), var(--gold), transparent); }
 
-  /* ════════════════════════════════
-     RESPONSIVE
-  ════════════════════════════════ */
-
-  /* Tablet: ≤1024px */
   @media (max-width: 1024px) {
-    nav { padding: 18px 32px; }
-    nav.scrolled { padding: 12px 32px; }
+    nav { padding: 12px 32px; }
+    nav.scrolled { padding: 8px 32px; }
     .nav-links { gap: 20px; }
     .nav-links a { font-size: 12px; }
-
     #home { padding: 100px 32px 60px; gap: 32px; }
     #about { padding: 100px 32px; gap: 40px; }
     #products { padding: 100px 32px; }
     .contact-info-section { padding: 80px 32px; }
     footer { padding: 36px 32px; }
-
     .products-grid { grid-template-columns: repeat(2, 1fr); }
     .contact-info { grid-template-columns: repeat(2, 1fr); }
   }
 
-  /* Mobile: ≤768px */
   @media (max-width: 768px) {
-    nav { padding: 16px 20px; }
-    nav.scrolled { padding: 12px 20px; }
-
-    /* Hide desktop nav links, show hamburger */
+    nav { padding: 12px 20px; }
+    nav.scrolled { padding: 8px 20px; }
     .nav-right { display: none; }
     .hamburger { display: flex; }
-
-    /* Hero: stack vertically */
     #home {
       grid-template-columns: 1fr;
       padding: 100px 20px 48px;
@@ -710,40 +766,22 @@
     .hero-visual { order: -1; }
     .paper-roll-wrapper { width: 200px; height: 240px; }
     .roll-svg-wrap svg { width: 190px; height: 190px; }
-
-    /* About: stack */
-    #about {
-      grid-template-columns: 1fr;
-      padding: 100px 20px 60px;
-      gap: 48px;
-    }
-    #about::before { font-size: 80px; }
+    #about { grid-template-columns: 1fr; padding: 100px 20px 60px; gap: 48px; }
+    #about::before { font-size: 70px; }
     .about-stats { order: -1; }
     .stat-number { font-size: 40px; }
-
-    /* Products */
     #products { padding: 100px 20px 60px; }
-    .products-grid { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: 1fr; max-width: 100%; }
     .product-card { padding: 32px 24px; }
-
-    /* Contact */
     .contact-info-section { padding: 80px 20px 60px; }
     .contact-info { grid-template-columns: 1fr 1fr; }
-
-    /* Footer */
-    footer {
-      padding: 32px 20px;
-      flex-direction: column;
-      text-align: center;
-      gap: 20px;
-    }
+    footer { padding: 32px 20px; flex-direction: column; text-align: center; gap: 20px; }
     .footer-links { justify-content: center; }
-
-    /* FAB label hidden on very small if needed */
     .whatsapp-fab { bottom: 20px; left: 16px; padding: 12px 16px 12px 14px; font-size: 13px; }
+    .logo-upload-btn { bottom: 20px; right: 16px; font-size: 12px; padding: 8px 14px; }
+    .mobile-menu { top: 66px; }
   }
 
-  /* Small mobile: ≤480px */
   @media (max-width: 480px) {
     .hero-title { font-size: 38px; }
     .section-title { font-size: 28px; }
@@ -753,6 +791,8 @@
     .whatsapp-fab { padding: 14px; border-radius: 50%; }
     .stat-box { padding: 28px 20px; }
     .stat-number { font-size: 36px; }
+    .logo-img { height: 44px; }
+    .logo-placeholder { height: 44px; font-size: 17px; }
   }
 </style>
 </head>
@@ -760,7 +800,7 @@
 
 <div class="scroll-line" id="scrollLine"></div>
 
-<!-- ── WHATSAPP FAB (fixed, all pages) ── -->
+<!-- ── WHATSAPP FAB ── -->
 <a class="whatsapp-fab" href="https://wa.me/201565765765" target="_blank" rel="noopener" id="waFab">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
@@ -770,7 +810,9 @@
 
 <!-- ── NAV ── -->
 <nav id="nav">
-  <span class="logo" onclick="showPage('home')">Eagle</span>
+  <span class="logo-wrap" onclick="showPage('home')" id="navLogoWrap">
+    <img class="logo-img" src="IMG/logo.png" alt="Miguel Factory">
+  </span>
 
   <div class="nav-right">
     <ul class="nav-links">
@@ -786,7 +828,6 @@
     </div>
   </div>
 
-  <!-- Hamburger (mobile) -->
   <div class="hamburger" id="hamburger" onclick="toggleMenu()">
     <span></span><span></span><span></span>
   </div>
@@ -810,9 +851,9 @@
   <section id="home" style="padding-top:100px">
     <div class="hero-grid-lines"></div>
     <div class="hero-text">
-      <p class="hero-eyebrow" data-ar="الرائدون في مصر منذ 2010" data-en="Egypt's Leading Supplier Since 2010">الرائدون في مصر منذ 2010</p>
-      <h1 class="hero-title" data-ar="بكرات<br><em>ورق</em><br>ريسيت" data-en="Thermal<br><em>Paper</em><br>Rolls">بكرات<br><em>ورق</em><br>ريسيت</h1>
-      <p class="hero-desc" data-ar="نوفر أفضل أنواع بكرات الورق الحرارية وبكرات الريسيت للمحلات والشركات والمطاعم بأعلى جودة وأفضل الأسعار." data-en="We supply premium thermal paper rolls and receipt rolls for shops, businesses, and restaurants — top quality at unbeatable prices.">نوفر أفضل أنواع بكرات الورق الحرارية وبكرات الريسيت للمحلات والشركات والمطاعم بأعلى جودة وأفضل الأسعار.</p>
+      <p class="hero-eyebrow" data-ar="مصنع متخصص في إنتاج الورق منذ 2010" data-en="Specialized Paper Production Factory Since 2010">مصنع متخصص في إنتاج الورق منذ 2010</p>
+      <h1 class="hero-title" data-ar="ملصقات<br><em>باركود</em><br>وبكرات" data-en="Barcode<br><em>Labels</em><br>& Rolls">ملصقات<br><em>باركود</em><br>وبكرات</h1>
+      <p class="hero-desc" data-ar="نوفر أعلى جودة من ملصقات الباركود وبكرات الريسيت للمحلات والمصانع والشركات — بدقة في المواصفات وأسعار لا تُنافس." data-en="We supply premium barcode labels and receipt rolls for shops, factories, and businesses — precise specs at unbeatable prices.">نوفر أعلى جودة من ملصقات الباركود وبكرات الريسيت للمحلات والمصانع والشركات — بدقة في المواصفات وأسعار لا تُنافس.</p>
       <div class="hero-cta">
         <a class="btn-primary" onclick="showPage('products')" data-ar="تصفح المنتجات" data-en="Browse Products">تصفح المنتجات</a>
         <a class="btn-outline" onclick="showPage('contact')"  data-ar="تواصل معنا"    data-en="Contact Us">تواصل معنا</a>
@@ -834,22 +875,22 @@
               </radialGradient>
             </defs>
             <circle cx="130" cy="130" r="125" fill="url(#rollBody)"/>
-            <circle cx="130" cy="130" r="122" fill="none" stroke="#e8e3d8" stroke-width="1.8" opacity="0.12"/>
-            <circle cx="130" cy="130" r="114" fill="none" stroke="#e8e3d8" stroke-width="1.5" opacity="0.10"/>
-            <circle cx="130" cy="130" r="106" fill="none" stroke="#e8e3d8" stroke-width="1.8" opacity="0.12"/>
-            <circle cx="130" cy="130" r="98"  fill="none" stroke="#e8e3d8" stroke-width="1.5" opacity="0.09"/>
-            <circle cx="130" cy="130" r="90"  fill="none" stroke="#e8e3d8" stroke-width="1.8" opacity="0.11"/>
-            <circle cx="130" cy="130" r="82"  fill="none" stroke="#e8e3d8" stroke-width="1.5" opacity="0.09"/>
-            <circle cx="130" cy="130" r="74"  fill="none" stroke="#e8e3d8" stroke-width="1.8" opacity="0.10"/>
-            <circle cx="130" cy="130" r="66"  fill="none" stroke="#e8e3d8" stroke-width="1.5" opacity="0.08"/>
-            <circle cx="130" cy="130" r="55" fill="url(#coreBody)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
-            <circle cx="130" cy="130" r="26" fill="#060606" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-            <circle cx="130" cy="130" r="20" fill="#030303" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-            <ellipse cx="95" cy="85" rx="28" ry="16" fill="rgba(255,255,255,0.04)" transform="rotate(-35,95,85)"/>
-            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(255,255,255,0.25)" stroke-width="2.5" stroke-linecap="round" transform="rotate(90,130,130)"/>
-            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round" transform="rotate(180,130,130)"/>
-            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(255,255,255,0.25)" stroke-width="2.5" stroke-linecap="round" transform="rotate(270,130,130)"/>
+            <circle cx="130" cy="130" r="122" fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.18"/>
+            <circle cx="130" cy="130" r="114" fill="none" stroke="#e8d08a" stroke-width="1.5" opacity="0.10"/>
+            <circle cx="130" cy="130" r="106" fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.16"/>
+            <circle cx="130" cy="130" r="98"  fill="none" stroke="#e8d08a" stroke-width="1.5" opacity="0.09"/>
+            <circle cx="130" cy="130" r="90"  fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.14"/>
+            <circle cx="130" cy="130" r="82"  fill="none" stroke="#e8d08a" stroke-width="1.5" opacity="0.09"/>
+            <circle cx="130" cy="130" r="74"  fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.12"/>
+            <circle cx="130" cy="130" r="66"  fill="none" stroke="#e8d08a" stroke-width="1.5" opacity="0.08"/>
+            <circle cx="130" cy="130" r="55" fill="url(#coreBody)" stroke="rgba(201,168,76,0.15)" stroke-width="1.5"/>
+            <circle cx="130" cy="130" r="26" fill="#060606" stroke="rgba(201,168,76,0.2)" stroke-width="2"/>
+            <circle cx="130" cy="130" r="20" fill="#030303" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>
+            <ellipse cx="95" cy="85" rx="28" ry="16" fill="rgba(201,168,76,0.04)" transform="rotate(-35,95,85)"/>
+            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(201,168,76,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(201,168,76,0.35)" stroke-width="2.5" stroke-linecap="round" transform="rotate(90,130,130)"/>
+            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(201,168,76,0.5)" stroke-width="2.5" stroke-linecap="round" transform="rotate(180,130,130)"/>
+            <line x1="130" y1="6" x2="130" y2="18" stroke="rgba(201,168,76,0.35)" stroke-width="2.5" stroke-linecap="round" transform="rotate(270,130,130)"/>
           </svg>
         </div>
         <div class="paper-tail">
@@ -858,38 +899,37 @@
             <span></span><span></span><span></span><span></span>
           </div>
         </div>
-        <div class="roll-label">THERMAL PAPER ROLLS</div>
+        <div class="roll-label">MIGUEL PAPER FACTORY</div>
       </div>
     </div>
   </section>
 
   <div class="marquee-wrap">
     <div class="marquee-track">
-      <span class="marquee-item" data-ar="بكرات حرارية"    data-en="Thermal Rolls">بكرات حرارية</span>
-      <span class="marquee-item" data-ar="ورق POS"          data-en="POS Paper">ورق POS</span>
-      <span class="marquee-item" data-ar="بكرات الكاشير"   data-en="Cashier Rolls">بكرات الكاشير</span>
-      <span class="marquee-item" data-ar="ريسيت ATM"        data-en="ATM Receipt">ريسيت ATM</span>
-      <span class="marquee-item" data-ar="ورق فاكس"         data-en="Fax Paper">ورق فاكس</span>
-      <span class="marquee-item" data-ar="بكرات ملونة"      data-en="Colored Rolls">بكرات ملونة</span>
-      <span class="marquee-item" data-ar="توصيل لكل مصر"   data-en="Nationwide Delivery">توصيل لكل مصر</span>
-      <span class="marquee-item" data-ar="جودة مضمونة"      data-en="Quality Guaranteed">جودة مضمونة</span>
-      <span class="marquee-item" data-ar="بكرات حرارية"    data-en="Thermal Rolls">بكرات حرارية</span>
-      <span class="marquee-item" data-ar="ورق POS"          data-en="POS Paper">ورق POS</span>
-      <span class="marquee-item" data-ar="بكرات الكاشير"   data-en="Cashier Rolls">بكرات الكاشير</span>
-      <span class="marquee-item" data-ar="ريسيت ATM"        data-en="ATM Receipt">ريسيت ATM</span>
-      <span class="marquee-item" data-ar="ورق فاكس"         data-en="Fax Paper">ورق فاكس</span>
-      <span class="marquee-item" data-ar="بكرات ملونة"      data-en="Colored Rolls">بكرات ملونة</span>
-      <span class="marquee-item" data-ar="توصيل لكل مصر"   data-en="Nationwide Delivery">توصيل لكل مصر</span>
-      <span class="marquee-item" data-ar="جودة مضمونة"      data-en="Quality Guaranteed">جودة مضمونة</span>
+      <span class="marquee-item" data-ar="ملصقات باركود"    data-en="Barcode Labels">ملصقات باركود</span>
+      <span class="marquee-item" data-ar="لايبل سبليت"       data-en="Split Labels">لايبل سبليت</span>
+      <span class="marquee-item" data-ar="بكرات الكاشير"     data-en="Cash Register Rolls">بكرات الكاشير</span>
+      <span class="marquee-item" data-ar="مقاس 2.5×5 سم"     data-en="Size 2.5×5 cm">مقاس 2.5×5 سم</span>
+      <span class="marquee-item" data-ar="مقاس 2.5×4 سم"     data-en="Size 2.5×4 cm">مقاس 2.5×4 سم</span>
+      <span class="marquee-item" data-ar="توصيل لكل مصر"     data-en="Nationwide Delivery">توصيل لكل مصر</span>
+      <span class="marquee-item" data-ar="جودة مضمونة"        data-en="Quality Guaranteed">جودة مضمونة</span>
+      <span class="marquee-item" data-ar="مصنع ميغيل"         data-en="Miguel Factory">مصنع ميغيل</span>
+      <span class="marquee-item" data-ar="ملصقات باركود"    data-en="Barcode Labels">ملصقات باركود</span>
+      <span class="marquee-item" data-ar="لايبل سبليت"       data-en="Split Labels">لايبل سبليت</span>
+      <span class="marquee-item" data-ar="بكرات الكاشير"     data-en="Cash Register Rolls">بكرات الكاشير</span>
+      <span class="marquee-item" data-ar="مقاس 2.5×5 سم"     data-en="Size 2.5×5 cm">مقاس 2.5×5 سم</span>
+      <span class="marquee-item" data-ar="مقاس 2.5×4 سم"     data-en="Size 2.5×4 cm">مقاس 2.5×4 سم</span>
+      <span class="marquee-item" data-ar="توصيل لكل مصر"     data-en="Nationwide Delivery">توصيل لكل مصر</span>
+      <span class="marquee-item" data-ar="جودة مضمونة"        data-en="Quality Guaranteed">جودة مضمونة</span>
+      <span class="marquee-item" data-ar="مصنع ميغيل"         data-en="Miguel Factory">مصنع ميغيل</span>
     </div>
   </div>
 
-  <!-- Contact info on home -->
   <section class="contact-info-section" style="min-height:auto">
     <div class="contact-inner">
       <div class="contact-header">
         <p class="section-tag" data-ar="تواصل معنا" data-en="Get In Touch">تواصل معنا</p>
-        <h2 class="section-title" data-ar='نحن هنا <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">لخدمتك</em>' data-en='We Are Here <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">For You</em>'>نحن هنا <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">لخدمتك</em></h2>
+        <h2 class="section-title" data-ar='نحن هنا <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">لخدمتك</em>' data-en='We Are Here <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">For You</em>'>نحن هنا <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">لخدمتك</em></h2>
         <div class="divider" style="margin:20px auto"></div>
         <p class="section-text" data-ar="تواصل معنا بأي طريقة تناسبك وهنرد عليك في أسرع وقت" data-en="Reach out in any way that suits you — we'll get back to you as soon as possible.">تواصل معنا بأي طريقة تناسبك وهنرد عليك في أسرع وقت</p>
       </div>
@@ -902,7 +942,7 @@
         <div class="info-item">
           <div class="info-icon">📧</div>
           <div class="info-label" data-ar="الإيميل" data-en="Email">الإيميل</div>
-          <div class="info-value">info@Eagle.com</div>
+          <div class="info-value">info@miguel.com</div>
         </div>
         <div class="info-item">
           <div class="info-icon">📍</div>
@@ -927,11 +967,11 @@
   <section id="about" style="min-height:100vh;padding-top:140px">
     <div style="position:relative;z-index:2">
       <p class="section-tag" data-ar="من نحن" data-en="About Us">من نحن</p>
-      <h2 class="section-title" data-ar='شركة رائدة<br>في سوق <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">الورق</em>' data-en='A Leader<br>In The <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">Paper</em> Market'>شركة رائدة<br>في سوق <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">الورق</em></h2>
+      <h2 class="section-title" data-ar='مصنع رائد<br>في <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">إنتاج الورق</em>' data-en='A Leader<br>In <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">Paper Production</em>'>مصنع رائد<br>في <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">إنتاج الورق</em></h2>
       <div class="divider"></div>
-      <p class="section-text" data-ar="Eagle شركة متخصصة في توريد وبيع بكرات الورق الحرارية وبكرات الريسيت بجميع المقاسات والمواصفات. بدأنا رحلتنا عام 2010 بهدف واحد: توفير أعلى جودة بأفضل سعر." data-en="Eagle specializes in supplying thermal paper rolls and receipt rolls in all sizes and specs. We started our journey in 2010 with one goal: the highest quality at the best price.">Eagle شركة متخصصة في توريد وبيع بكرات الورق الحرارية وبكرات الريسيت بجميع المقاسات والمواصفات. بدأنا رحلتنا عام 2010 بهدف واحد: توفير أعلى جودة بأفضل سعر.</p>
-      <p class="section-text" data-ar="نخدم آلاف العملاء من محلات البقالة والسوبر ماركت والمطاعم والبنوك وشركات التوصيل في كل محافظات مصر." data-en="We serve thousands of customers — grocery stores, supermarkets, restaurants, banks, and delivery companies across all of Egypt's governorates.">نخدم آلاف العملاء من محلات البقالة والسوبر ماركت والمطاعم والبنوك وشركات التوصيل في كل محافظات مصر.</p>
-      <p class="section-text" data-ar="منتجاتنا مطابقة لأعلى معايير الجودة ومضمونة 100% — لو مش راضي، هنرجعلك فلوسك." data-en="Our products meet the highest quality standards and are 100% guaranteed — not satisfied? We'll refund you.">منتجاتنا مطابقة لأعلى معايير الجودة ومضمونة 100% — لو مش راضي، هنرجعلك فلوسك.</p>
+      <p class="section-text" data-ar="Miguel هو مصنع متخصص في تصنيع وتوريد ملصقات الباركود ولايبل السبليت وبكرات ريسيت الكاشير بأعلى معايير الجودة. بدأنا رحلتنا عام 2010 بهدف واحد واضح: توفير منتجات ورقية دقيقة تُلبي احتياجات السوق المصري." data-en="Miguel is a specialized factory for manufacturing and supplying barcode labels, split labels, and cash register receipt rolls to the highest quality standards. We started in 2010 with one clear goal: delivering precise paper products that meet Egypt's market demands.">Miguel هو مصنع متخصص في تصنيع وتوريد ملصقات الباركود ولايبل السبليت وبكرات ريسيت الكاشير بأعلى معايير الجودة. بدأنا رحلتنا عام 2010 بهدف واحد واضح: توفير منتجات ورقية دقيقة تُلبي احتياجات السوق المصري.</p>
+      <p class="section-text" data-ar="نخدم آلاف العملاء من المحلات والسوبر ماركت والصيدليات والمستشفيات والمصانع في جميع محافظات مصر، بتوريد منتظم وضمان على الجودة." data-en="We serve thousands of clients including shops, supermarkets, pharmacies, hospitals, and factories across all of Egypt's governorates, with regular supply and a quality guarantee.">نخدم آلاف العملاء من المحلات والسوبر ماركت والصيدليات والمستشفيات والمصانع في جميع محافظات مصر، بتوريد منتظم وضمان على الجودة.</p>
+      <p class="section-text" data-ar="منتجاتنا مطابقة لأعلى معايير الدقة والوضوح في الطباعة ومضمونة 100%" data-en="Our products meet the highest standards of precision and print clarity, 100% guaranteed">منتجاتنا مطابقة لأعلى معايير الدقة والوضوح في الطباعة ومضمونة 100%</p>
     </div>
     <div class="about-stats" style="position:relative;z-index:2">
       <div class="stat-box scroll-reveal">
@@ -943,8 +983,8 @@
         <div class="stat-label" data-ar="عميل راضي" data-en="Happy Clients">عميل راضي</div>
       </div>
       <div class="stat-box scroll-reveal">
-        <div class="stat-number">30+</div>
-        <div class="stat-label" data-ar="نوع منتج" data-en="Product Types">نوع منتج</div>
+        <div class="stat-number">4</div>
+        <div class="stat-label" data-ar="منتج متخصص" data-en="Specialized Products">منتج متخصص</div>
       </div>
       <div class="stat-box scroll-reveal">
         <div class="stat-number">27</div>
@@ -966,74 +1006,50 @@
     <div class="products-grid">
       <div class="product-card scroll-reveal">
         <div class="product-number">01</div>
-        <div class="product-icon">🧻</div>
-        <h3 class="product-name" data-ar="بكرات POS الحرارية" data-en="Thermal POS Rolls">بكرات POS الحرارية</h3>
-        <p class="product-desc" data-ar="للماكينات والكاشير، طباعة واضحة وحبر دايم بدون حاجة لحبر أو تونر." data-en="For POS machines and cashiers — sharp, lasting print with no ink or toner needed.">للماكينات والكاشير، طباعة واضحة وحبر دايم بدون حاجة لحبر أو تونر.</p>
+        <div class="product-icon">🏷️</div>
+        <h3 class="product-name" data-ar="ملصقات باركود — 2.5×5 سم" data-en="Barcode Labels — W 2.5×5 cm">ملصقات باركود — 2.5×5 سم</h3>
+        <p class="product-desc" data-ar="ملصقات باركود حرارية عالية الدقة بمقاس 2.5 × 5 سم، مثالية للمنتجات والرفوف والمستودعات والمحلات التجارية." data-en="High-precision thermal barcode labels sized W 2.5 × 5 cm — ideal for products, shelves, warehouses, and retail stores.">ملصقات باركود حرارية عالية الدقة بمقاس 2.5 × 5 سم، مثالية للمنتجات والرفوف والمستودعات والمحلات التجارية.</p>
         <ul class="product-specs">
-          <li data-ar="مقاسات: 57mm, 80mm" data-en="Widths: 57mm, 80mm">مقاسات: 57mm, 80mm</li>
-          <li data-ar="أقطار: 40m, 50m, 60m, 80m" data-en="Lengths: 40m, 50m, 60m, 80m">أقطار: 40m, 50m, 60m, 80m</li>
-          <li data-ar="ورق حراري عالي الجودة" data-en="High-quality thermal paper">ورق حراري عالي الجودة</li>
-          <li data-ar="متوفر بكميات كبيرة" data-en="Available in bulk">متوفر بكميات كبيرة</li>
+          <li data-ar="العرض: 2.5 سم | الطول: 5 سم" data-en="Width: 2.5 cm | Length: 5 cm">العرض: 2.5 سم | الطول: 5 سم</li>
+          <li data-ar="طباعة حرارية واضحة وثابتة" data-en="Clear, stable thermal printing">طباعة حرارية واضحة وثابتة</li>
+          <li data-ar="لاصق قوي يثبت على جميع الأسطح" data-en="Strong adhesive for all surfaces">لاصق قوي يثبت على جميع الأسطح</li>
+          <li data-ar="متوفر بكميات كبيرة وبالجملة" data-en="Available in bulk & wholesale">متوفر بكميات كبيرة وبالجملة</li>
         </ul>
       </div>
       <div class="product-card scroll-reveal">
         <div class="product-number">02</div>
-        <div class="product-icon">🏧</div>
-        <h3 class="product-name" data-ar="بكرات ريسيت ATM" data-en="ATM Receipt Rolls">بكرات ريسيت ATM</h3>
-        <p class="product-desc" data-ar="مخصصة لماكينات الصراف الآلي بمواصفات دقيقة تتناسب مع جميع الماركات." data-en="Designed for ATM machines with precise specs compatible with all major brands.">مخصصة لماكينات الصراف الآلي بمواصفات دقيقة تتناسب مع جميع الماركات.</p>
+        <div class="product-icon">🔖</div>
+        <h3 class="product-name" data-ar="ملصقات باركود — 2.5×4 سم" data-en="Barcode Labels — W 2.5×4 cm">ملصقات باركود — 2.5×4 سم</h3>
+        <p class="product-desc" data-ar="ملصقات باركود حرارية بمقاس 2.5 × 4 سم، مناسبة للمنتجات الصغيرة والتسعير والفرز في المصانع والمحلات." data-en="Thermal barcode labels sized W 2.5 × 4 cm — suitable for small products, pricing, and sorting in factories and shops.">ملصقات باركود حرارية بمقاس 2.5 × 4 سم، مناسبة للمنتجات الصغيرة والتسعير والفرز في المصانع والمحلات.</p>
         <ul class="product-specs">
-          <li data-ar="مقاسات متعددة حسب الجهاز" data-en="Multiple sizes per device">مقاسات متعددة حسب الجهاز</li>
-          <li data-ar="ورق عالي الحساسية الحرارية" data-en="High thermal sensitivity paper">ورق عالي الحساسية الحرارية</li>
-          <li data-ar="مقاوم للرطوبة والحرارة" data-en="Moisture & heat resistant">مقاوم للرطوبة والحرارة</li>
-          <li data-ar="معتمد من البنوك" data-en="Bank-approved">معتمد من البنوك</li>
+          <li data-ar="العرض: 2.5 سم | الطول: 4 سم" data-en="Width: 2.5 cm | Length: 4 cm">العرض: 2.5 سم | الطول: 4 سم</li>
+          <li data-ar="مناسب لطابعات الباركود الحرارية" data-en="Compatible with thermal barcode printers">مناسب لطابعات الباركود الحرارية</li>
+          <li data-ar="مقاوم للرطوبة والخدش" data-en="Moisture & scratch resistant">مقاوم للرطوبة والخدش</li>
+          <li data-ar="متوفر بالجملة والتجزئة" data-en="Wholesale & retail available">متوفر بالجملة والتجزئة</li>
         </ul>
       </div>
       <div class="product-card scroll-reveal">
         <div class="product-number">03</div>
-        <div class="product-icon">📠</div>
-        <h3 class="product-name" data-ar="بكرات ورق الفاكس" data-en="Fax Paper Rolls">بكرات ورق الفاكس</h3>
-        <p class="product-desc" data-ar="ورق فاكس حراري عالي الوضوح للمكاتب والشركات بجميع المقاسات." data-en="High-clarity thermal fax paper for offices and businesses in all sizes.">ورق فاكس حراري عالي الوضوح للمكاتب والشركات بجميع المقاسات.</p>
+        <div class="product-icon">🗂️</div>
+        <h3 class="product-name" data-ar="لايبل سبليت" data-en="Split Labels">لايبل سبليت</h3>
+        <p class="product-desc" data-ar="ملصقات سبليت مصنوعة بدقة عالية للتصنيف والتوزيع، تُستخدم في المصانع والمستودعات وسلاسل التوريد." data-en="High-precision split labels for categorization and distribution — widely used in factories, warehouses, and supply chains.">ملصقات سبليت مصنوعة بدقة عالية للتصنيف والتوزيع، تُستخدم في المصانع والمستودعات وسلاسل التوريد.</p>
         <ul class="product-specs">
-          <li data-ar="عرض: A4 (210mm)" data-en="Width: A4 (210mm)">عرض: A4 (210mm)</li>
-          <li data-ar="أطوال مختلفة" data-en="Various lengths">أطوال مختلفة</li>
-          <li data-ar="وضوح طباعة ممتاز" data-en="Excellent print clarity">وضوح طباعة ممتاز</li>
-          <li data-ar="طول عمر التخزين" data-en="Long shelf life">طول عمر التخزين</li>
+          <li data-ar="تصميم سبليت متعدد الاستخدامات" data-en="Multi-use split design">تصميم سبليت متعدد الاستخدامات</li>
+          <li data-ar="جودة طباعة فائقة" data-en="Superior print quality">جودة طباعة فائقة</li>
+          <li data-ar="مقاسات متعددة حسب الطلب" data-en="Multiple sizes available on request">مقاسات متعددة حسب الطلب</li>
+          <li data-ar="مناسب للمستشفيات والمصانع" data-en="Suitable for hospitals & factories">مناسب للمستشفيات والمصانع</li>
         </ul>
       </div>
       <div class="product-card scroll-reveal">
         <div class="product-number">04</div>
-        <div class="product-icon">🎰</div>
-        <h3 class="product-name" data-ar="بكرات الكاشير" data-en="Cashier Rolls">بكرات الكاشير</h3>
-        <p class="product-desc" data-ar="لمحلات البقالة والسوبر ماركت والمطاعم، بكرات متينة ومضمونة." data-en="For grocery stores, supermarkets, and restaurants — durable and reliable rolls.">لمحلات البقالة والسوبر ماركت والمطاعم، بكرات متينة ومضمونة.</p>
+        <div class="product-icon">🧾</div>
+        <h3 class="product-name" data-ar="بكرات ريسيت الكاشير" data-en="Cash Register Receipt Rolls">بكرات ريسيت الكاشير</h3>
+        <p class="product-desc" data-ar="بكرات ريسيت حرارية عالية الجودة لماكينات الكاشير في المحلات والمطاعم والسوبر ماركت، بطباعة واضحة وعمر افتراضي طويل." data-en="High-quality thermal receipt rolls for cash register machines in shops, restaurants, and supermarkets — clear print and long shelf life.">بكرات ريسيت حرارية عالية الجودة لماكينات الكاشير في المحلات والمطاعم والسوبر ماركت، بطباعة واضحة وعمر افتراضي طويل.</p>
         <ul class="product-specs">
-          <li data-ar="مناسبة لكل أنواع الكاشير" data-en="Fits all cashier types">مناسبة لكل أنواع الكاشير</li>
+          <li data-ar="مقاسات: 57mm و80mm" data-en="Widths: 57mm & 80mm">مقاسات: 57mm و80mm</li>
           <li data-ar="طباعة سريعة وواضحة" data-en="Fast & clear printing">طباعة سريعة وواضحة</li>
-          <li data-ar="لا تتلف بالحرارة العادية" data-en="Heat-safe under normal conditions">لا تتلف بالحرارة العادية</li>
+          <li data-ar="ورق حراري عالي الحساسية" data-en="High sensitivity thermal paper">ورق حراري عالي الحساسية</li>
           <li data-ar="متوفر بالجملة والقطاعي" data-en="Wholesale & retail available">متوفر بالجملة والقطاعي</li>
-        </ul>
-      </div>
-      <div class="product-card scroll-reveal">
-        <div class="product-number">05</div>
-        <div class="product-icon">🎨</div>
-        <h3 class="product-name" data-ar="بكرات ملونة" data-en="Colored Rolls">بكرات ملونة</h3>
-        <p class="product-desc" data-ar="بكرات بألوان متعددة للتمييز والتصنيف، مناسبة للمستشفيات والمصانع." data-en="Multi-color rolls for categorization — ideal for hospitals and factories.">بكرات بألوان متعددة للتمييز والتصنيف، مناسبة للمستشفيات والمصانع.</p>
-        <ul class="product-specs">
-          <li data-ar="ألوان: أزرق، أخضر، أصفر، وردي" data-en="Colors: Blue, Green, Yellow, Pink">ألوان: أزرق، أخضر، أصفر، وردي</li>
-          <li data-ar="نفس جودة البكرات البيضاء" data-en="Same quality as white rolls">نفس جودة البكرات البيضاء</li>
-          <li data-ar="طباعة حرارية ممتازة" data-en="Excellent thermal printing">طباعة حرارية ممتازة</li>
-          <li data-ar="للطلبات الخاصة" data-en="Available on special order">للطلبات الخاصة</li>
-        </ul>
-      </div>
-      <div class="product-card scroll-reveal">
-        <div class="product-number">06</div>
-        <div class="product-icon">📦</div>
-        <h3 class="product-name" data-ar="بكرات بالجملة" data-en="Wholesale Rolls">بكرات بالجملة</h3>
-        <p class="product-desc" data-ar="أسعار خاصة جداً للكميات الكبيرة والموزعين مع ضمان التوريد المنتظم." data-en="Special bulk prices for distributors with guaranteed regular supply.">أسعار خاصة جداً للكميات الكبيرة والموزعين مع ضمان التوريد المنتظم.</p>
-        <ul class="product-specs">
-          <li data-ar="أسعار الجملة الأفضل في السوق" data-en="Best wholesale prices in market">أسعار الجملة الأفضل في السوق</li>
-          <li data-ar="توريد منتظم وموثوق" data-en="Regular & reliable supply">توريد منتظم وموثوق</li>
-          <li data-ar="مناسب للموزعين والتجار" data-en="Ideal for distributors & traders">مناسب للموزعين والتجار</li>
-          <li data-ar="تغليف مخصص بالاسم" data-en="Custom branded packaging">تغليف مخصص بالاسم</li>
         </ul>
       </div>
     </div>
@@ -1050,7 +1066,7 @@
     <div class="contact-inner">
       <div class="contact-header">
         <p class="section-tag" data-ar="نحن هنا لخدمتك" data-en="We're Here For You">نحن هنا لخدمتك</p>
-        <h2 class="section-title" data-ar='تواصل <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">معنا</em>' data-en='Get In <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">Touch</em>'>تواصل <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #f5f5f0">معنا</em></h2>
+        <h2 class="section-title" data-ar='تواصل <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">معنا</em>' data-en='Get In <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">Touch</em>'>تواصل <em style="font-style:normal;color:transparent;-webkit-text-stroke:1px #c9a84c">معنا</em></h2>
         <div class="divider" style="margin:20px auto"></div>
         <p class="section-text" data-ar="تواصل معنا بأي طريقة تناسبك وهنرد عليك في أسرع وقت بأفضل عرض" data-en="Reach out in any way that suits you — we'll respond quickly with the best offer.">تواصل معنا بأي طريقة تناسبك وهنرد عليك في أسرع وقت بأفضل عرض</p>
       </div>
@@ -1063,7 +1079,7 @@
         <div class="info-item">
           <div class="info-icon">📧</div>
           <div class="info-label" data-ar="الإيميل" data-en="Email">الإيميل</div>
-          <div class="info-value">info@Eagle.com</div>
+          <div class="info-value">info@miguel.com</div>
         </div>
         <div class="info-item">
           <div class="info-icon">📍</div>
@@ -1085,8 +1101,8 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Eagle</div>
-  <p class="footer-copy" data-ar="© 2025 Eagle — جميع الحقوق محفوظة" data-en="© 2025 Eagle — All Rights Reserved">© 2025 Eagle — جميع الحقوق محفوظة</p>
+  <img class="footer-logo-img" src="IMG/logo.png" alt="Miguel Factory">
+  <p class="footer-copy" data-ar="© 2025 Miguel — مصنع لإنتاج الورق — جميع الحقوق محفوظة" data-en="© 2025 Miguel — Factory for Paper Production — All Rights Reserved">© 2025 Miguel — مصنع لإنتاج الورق — جميع الحقوق محفوظة</p>
   <div class="footer-links">
     <a onclick="showPage('home')"     data-ar="الرئيسية"   data-en="Home">الرئيسية</a>
     <a onclick="showPage('products')" data-ar="المنتجات"   data-en="Products">المنتجات</a>
@@ -1096,7 +1112,6 @@
 
 <script>
   let currentLang = 'ar';
-
   function toggleLang() {
     currentLang = currentLang === 'ar' ? 'en' : 'ar';
     applyLang(currentLang);
